@@ -1,20 +1,21 @@
 import os
+from pathlib import Path
 
 
 def make_land_dir():
-    _path = os.path.expanduser("~")
-    land_dir_name = ".Scrapiary"
+    home_path = Path.home()
+    land_dir_name = "scrapiary"
+    full_dir_name = home_path.joinpath(home_path, land_dir_name)
 
-    if not os.path.exists(_path + land_dir_name):
-        os.chdir(_path)
+    if not full_dir_name.exists():
+        os.chdir(home_path)
         os.mkdir(land_dir_name)
+        #print(f"Done! Path is: {_path + land_dir_name} ")
     else:
         print(f"A directory named {land_dir_name} already exists! ")
-    return
+        return full_dir_name
 
-
-my_def = make_land_dir()
-
+    return full_dir_name
 
 
 # folder_name = dir_name.replace(':', '').replace('.','')
