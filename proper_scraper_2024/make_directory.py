@@ -2,20 +2,64 @@ import os
 from pathlib import Path
 
 
-def make_land_dir():
-    home_path = Path.home()
-    land_dir_name = "scrapiary"
-    full_dir_name = home_path.joinpath(home_path, land_dir_name)
+class BuildAppStructure:
+    def __init__(self):
+        self.home_path = Path.home()
+        self.base_dir_name: str = "wbs-scrapiary"
+        self.__complete_base_path = self.home_path.joinpath(
+            self.home_path, self.base_dir_name
+        )
+        __mode: int = int(0o755)
+        self.__mode = __mode
+        self.__subdirectories: tuple = (
+            "properly_app/modules",
+            "databases/docker_files",
+            "databases/directly_databases",
+            "user_files/user_pulled_files",
+        )
 
-    if not full_dir_name.exists():
-        os.chdir(home_path)
-        os.mkdir(land_dir_name)
-        #print(f"Done! Path is: {_path + land_dir_name} ")
-    else:
-        print(f"A directory named {land_dir_name} already exists! ")
-        return full_dir_name
 
-    return full_dir_name
+    def make_inner_dirs(self, path) -> bool:
+        try:
+            os.makedirs(path, exist_ok=True, mode=self.__mode)
+            print(f"Successfully created directory: {path}")
+            return True
+        except PermissionError:
+            print(f"Permission denied: Cannot create directory {path}")
+            return False
+        except OSError as oe:
+            print(f"Error creating directory {path}: {oe}")
+            return False
 
+
+    def create_dirs(self) -> list:
+        basing_path = self.__complete_base_path
+        if not basing_path.exists():
+            os.chdir(self.home_path)
+            os.mkdir(self.base_dir_name, mode=self.__mode)
+        else:
+            print(f"A directory named {self.base_dir_name} already exists! ")
+
+        full_paths_list = [basing_path]
+        for item in self.__subdirectories:
+            path_as_str = basing_path.joinpath(basing_path, item)
+            full_paths_list.append(path_as_str)
+
+        for path_ in full_paths_list:
+            self.make_inner_dirs(path_)
+
+        return full_paths_list
+
+
+    def output_app_structure(self) -> list:
+        app_struct_list = sorted(Path(self.__complete_base_path).glob('**' + os.sep))
+        print(app_struct_list)
+        return app_struct_list
+
+
+if __name__ == '__main__':
+    bld_prost = BuildAppStructure()
+    bld_prost.create_dirs()
+    bld_prost.output_app_structure()
 
 # folder_name = dir_name.replace(':', '').replace('.','')
